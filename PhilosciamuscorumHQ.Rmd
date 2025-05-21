@@ -1,0 +1,182 @@
+---
+title: "Philoscia muscorum high qualty food"
+author: "Sharmin Zaman"
+date: "2025-05-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+```{r}
+# Load libraries
+library(tidyverse)
+library(lubridate)
+library(gt)
+
+# Step 1: Input data directly
+
+# Growth Data
+growth_data <- tribble(
+  ~Date,     ~Sample, ~Weight_of_isopod_g,
+   "12-May",   "PM-2",     0.0332,
+   "12-May",   "PM-3",     0.0232,
+   "12-May",   "PM-4",     0.0323,
+   "12-May",   "PM-6",     0.0356,
+   "12-May",   "PM-7",     0.0289,
+   "12-May",   "PM-8",     0.0187,
+   "12-May",   "PM-9",     0.0301,
+   "12-May",   "PM-10",    0.0078,
+   "19-May",   "PM-2",     0.0343,
+   "19-May",	 "PM-3",	   0.0253,
+   "19-May",   "PM-4",	   0.0338,
+   "19-May",	 "PM-6",     0.0371,
+   "19-May",   "PM-7",	   0.0302,
+   "19-May",   "PM-8",     0.0203,
+   "19-May",	 "PM-9",	   0.0319,
+   "19-May",   "PM-10",	   0.0084,
+)
+
+
+# Defecation Data
+defecation_data <- tribble(
+  ~Date,     ~Sample, ~Faeces,
+  "16-May",	 "PM-2",	0.0024,
+  "16-May",	 "PM-3",	0.0039,
+  "16-May",  "PM-4",	0.0011,
+  "16-May",	 "PM-6",	0.0005,
+  "16-May",  "PM-7",	0.0016,
+  "16-May",  "PM-8",  0.0011,
+  "16-May",	 "PM-9",	0.0027,
+  "16-May",  "PM-10",	0.0010,
+)
+
+# Consumption Data
+consumption_data <- tribble(
+  ~Date,     ~Sample, ~Initial_fresh_v, ~Initial_fresh_vp, ~Left_over_fresh_vp, ~Eaten_v, ~Eaten_vp,
+   "12-May", "PM-2",  17.3217,          19.5790,           19.5753,             16.2696,  16.2696,
+   "12-May", "PM-3",	16.9081,        	19.2919,        	 19.2878,	            17.1427,	17.1427,
+   "12-May", "PM-4",	17.1603,	        18.9511,	         18.9482,	            16.9737,  16.9737,
+   "12-May", "PM-6",	16.7243,	        19.1931,	         19.1898,	            16.8839,	16.8839,
+   "12-May", "PM-7",	16.9137,	        19.2835,	         19.2801, 	          17.1452,	17.1452,
+   "12-May", "PM-8",	16.7258, 	        19.3963,	         19.3899,	            17.3230,  17.3230,
+   "12-May", "PM-9",	17.0840,	        19.5135,	         19.5126,           	17.0342,	17.0342,
+   "12-May", "PM-10",	17.7003,	        20.4549,	         20.4522,	            17.2717,	17.2717,
+   "15-May", "PM-2",  17.3217,          19.5737,           19.5887,             16.2696,  16.2702,
+   "15-May", "PM-3",	16.9081,        	19.2831,        	 19.2799,	            17.1427,	17.1430,
+   "15-May", "PM-4",	17.1603,	        18.9482,	         18.9353,	            16.9737,  16.9754,
+   "15-May", "PM-6",	16.7243,	        19.1898,	         19.1708,	            16.8839,	16.8841,
+   "15-May", "PM-7",	16.9137,	        19.2801,	         19.2779, 	          17.1452,	17.1460,
+   "15-May", "PM-8",	16.7258, 	        19.3899,	         20.3846,	            17.3230,	17.3238,
+   "15-May", "PM-9",	17.0840,	        19.5126,	         19.5122,           	17.0342,	17.0353,
+   "15-May", "PM-10",	17.7003,	        20.4522,	         20.4504,	            17.2717,	17.2754,
+   "17-May", "PM-2",  17.3217,          19.5887,           19.5783,             16.2696,  16.2724,
+   "17-May", "PM-3",	16.9081,        	19.2799,        	 19.2775,	            17.1427,	17.1434,
+   "17-May", "PM-4",	17.1603,	        18.9353,	         18.9241,	            16.9737,  16.9784,
+   "17-May", "PM-6",	16.7243,	        19.1708,	         19.1611,	            16.8839,	16.8841,
+   "17-May", "PM-7",	16.9137,	        19.2799,	         19.2699, 	          17.1452,	17.1464,
+   "17-May", "PM-8",	16.7258, 	        19.3846,	         20.3810,	            17.3230,	17.3248,
+   "17-May", "PM-9",	17.0840,	        19.5122,	         19.5052,           	17.0342,	17.0364,
+   "17-May", "PM-10",	17.7003,	        20.4504,	         20.4478,	            17.2717,	17.2762,
+   "19-May", "PM-2",  17.3217,          19.5790,           19.5695,             16.2696,  16.2742,
+   "19-May", "PM-3",	16.9081,        	19.2755,        	 19.2635,	            17.1427,	17.1469,
+   "19-May", "PM-4",	17.1603,	        18.9241,	         18.9234,	            16.9737,  16.9837,
+   "19-May", "PM-6",	16.7243,	        19.1611,	         19.1523,	            16.8839,	16.8928,
+   "19-May", "PM-7",	16.9137,	        19.2699,	         19.2627, 	          17.1452,	17.1530,
+   "19-May", "PM-8",	16.7258, 	        19.3810,	         19.3773,	            17.3230,	17.3252,
+   "19-May", "PM-9",	17.0840,	        19.5052,	         19.4986,           	17.0342,	17.0418,
+   "19-May", "PM-10",	17.7003,	        20.4478,	         20.4393,	            17.2717,	17.2772,
+)
+
+# Step 2: Convert dates
+
+growth_data <- growth_data %>%
+  mutate(Date = dmy(paste0(Date, ifelse(Date == "2-Jan", "-2025", "-2024"))))
+
+defecation_data <- defecation_data %>%
+  drop_na() %>%
+  mutate(Date = dmy(paste0(Date, ifelse(Date == "2-Jan", "-2025", "-2024"))))
+
+consumption_data <- consumption_data %>%
+  mutate(Date = dmy(paste0(Date, ifelse(Date == "2-Jan", "-2025", "-2024"))))
+
+# Step 3: Plot Growth Rate
+
+ggplot(growth_data, aes(x = Date, y = Weight_of_isopod_g, group = Sample)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~Sample, ncol = 5) +
+  ggtitle("Growth Rate of Philoscia muscorum") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Step 4: Plot Defecation Rate
+
+ggplot(defecation_data, aes(x = Date, y = Faeces, group = Sample)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~Sample, ncol = 5) +
+  ggtitle("Defecation Rate of Philoscia muscorum") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Step 5: Calculate Consumption
+
+consumption_data <- consumption_data %>%
+  mutate(Food_added = Initial_fresh_vp - Left_over_fresh_vp,
+         Cum_eaten_pellets = Eaten_vp - Eaten_v) %>%
+  select(Date, Sample, Food_added, Cum_eaten_pellets)
+
+# Step 6: Plot Consumption
+
+ggplot(consumption_data, aes(x = Date, y = Cum_eaten_pellets, group = Sample)) +
+  geom_line() +
+  facet_wrap(~Sample, ncol = 5) +
+  ylab("Cumulative pellets eaten (g)") +
+  ggtitle("Consumption Rate of Philoscia muscorum") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Step 7: Assimilation Efficiency
+
+assimilation_data <- consumption_data %>%
+  group_by(Sample) %>%
+  summarize(Food_added = sum(Food_added, na.rm = TRUE)) %>%
+  inner_join(
+    defecation_data %>%
+      group_by(Sample) %>%
+      summarize(Faeces = sum(Faeces, na.rm = TRUE)),
+    by = "Sample"
+  ) %>%
+  mutate(Assimilation_efficiency = (Food_added - Faeces) / Food_added)
+
+# Merge average weight
+assimilation_data <- assimilation_data %>%
+  inner_join(
+    growth_data %>%
+      group_by(Sample) %>%
+      summarize(Weight_of_isopod_g = mean(Weight_of_isopod_g, na.rm = TRUE)),
+    by = "Sample"
+  )
+
+# Step 8: Table Output
+
+assimilation_data %>%
+  gt() %>%
+  tab_header(title = "Assimilation Efficiency") %>%
+  cols_label(
+    Sample = "Sample",
+    Food_added = "Food eaten (mg)",
+    Faeces = "Faeces (mg)",
+    Assimilation_efficiency = "Assimilation Efficiency",
+    Weight_of_isopod_g = "Growth (mg/day)"
+  ) %>%
+  fmt_number(
+    columns = c(Assimilation_efficiency),
+    decimals = 4
+  ) %>%
+  tab_options(
+    table.width = px(600),
+    column_labels.font.weight = "bold"
+  )
+
+```
+
