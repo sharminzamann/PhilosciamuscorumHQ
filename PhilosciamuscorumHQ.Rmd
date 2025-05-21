@@ -15,7 +15,7 @@ library(tidyverse)
 library(lubridate)
 library(gt)
 
-# Step 1: Input data directly
+# Step 1: Input data directly:
 
 # Growth Data
 growth_data <- tribble(
